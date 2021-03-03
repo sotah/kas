@@ -11,6 +11,8 @@ RUN apt-get update && \
 ENV LANG=en_US.utf8
 
 RUN apt-get install --no-install-recommends -y \
+        openssh-client \
+        sudo \
         gawk wget git-core diffstat unzip texinfo \
         build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
         xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
@@ -32,5 +34,10 @@ ENV GIT_PROXY_COMMAND="oe-git-proxy" \
 
 COPY . /kas
 RUN pip3 --proxy=$https_proxy install --no-deps /kas && kas --help
+
+RUN useradd -m -s /bin/bash -G sudo runner
+RUN echo "runner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER runner
 
 ENTRYPOINT ["/kas/container-entrypoint"]
